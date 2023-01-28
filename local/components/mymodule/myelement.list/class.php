@@ -17,8 +17,7 @@ use Bitrix\Main\UserTable;
 
 class MyElementListComponent extends \CBitrixComponent implements Controllerable, Errorable
 {
-	protected $gridId = 'myelement_grid_list';
-    const IBLOCK_ID = 17;
+    protected $gridId = 'myelement_grid_list';
 
     public function __construct($component = null)
     {
@@ -53,49 +52,49 @@ class MyElementListComponent extends \CBitrixComponent implements Controllerable
 
     public function canEdit(): bool
     {
-        $iblockPermission = CIBlock::GetPermission(self::IBLOCK_ID);
+        $iblockPermission = CIBlock::GetPermission(ElementMyElementTable::getEntity()->getIblock()->getId());
         return ($iblockPermission >= 'U');
     }
 
-	public function executeComponent()
-	{
-		$pageNav = $this->getPageNavigation();
+    public function executeComponent()
+    {
+        $pageNav = $this->getPageNavigation();
 
-		$this->arResult['GridId'] = $this->gridId;
-		$this->arResult['GridColumns'] = $this->getGridColumns();
-		$this->arResult['GridRows'] = $this->getGridRows($pageNav);
-		$this->arResult['PageNavigation'] = $pageNav;
-		$this->arResult['PageSizes'] = $this->getPageSizes();
+        $this->arResult['GridId'] = $this->gridId;
+        $this->arResult['GridColumns'] = $this->getGridColumns();
+        $this->arResult['GridRows'] = $this->getGridRows($pageNav);
+        $this->arResult['PageNavigation'] = $pageNav;
+        $this->arResult['PageSizes'] = $this->getPageSizes();
 
 
-		return $this->includeComponentTemplate();
-	}
+        return $this->includeComponentTemplate();
+    }
 
-	protected function getGridColumns(): array
-	{
-		return [
-			['id' => 'NAME', 'name' => Loc::getMessage('MTH_COLUMN_NAME'), 'default' => true],
-			['id' => 'CODE', 'name' => Loc::getMessage('MTH_COLUMN_CODE'), 'default' => true],
-			['id' => 'DATE_CREATE', 'name' => Loc::getMessage('MTH_COLUMN_CREATED_DATE'), 'default' => true],
-			['id' => 'STATUS_VALUE', 'name' => Loc::getMessage('MTH_COLUMN_STATUS'), 'default' => true],
-			['id' => 'CREATED_BY', 'name' => Loc::getMessage('MTH_COLUMN_CREATED_BY'), 'default' => true],
-		];
-	}
+    protected function getGridColumns(): array
+    {
+        return [
+            ['id' => 'NAME', 'name' => Loc::getMessage('MTH_COLUMN_NAME'), 'default' => true],
+            ['id' => 'CODE', 'name' => Loc::getMessage('MTH_COLUMN_CODE'), 'default' => true],
+            ['id' => 'DATE_CREATE', 'name' => Loc::getMessage('MTH_COLUMN_CREATED_DATE'), 'default' => true],
+            ['id' => 'STATUS_VALUE', 'name' => Loc::getMessage('MTH_COLUMN_STATUS'), 'default' => true],
+            ['id' => 'CREATED_BY', 'name' => Loc::getMessage('MTH_COLUMN_CREATED_BY'), 'default' => true],
+        ];
+    }
 
-	protected function getGridRows(PageNavigation $pageNavigation): array
-	{
+    protected function getGridRows(PageNavigation $pageNavigation): array
+    {
         $canEdit = $this->canEdit();
-		$rows = [];
-		$order = ['ID' => 'desc'];
+        $rows = [];
+        $order = ['ID' => 'desc'];
 
         $query = ElementMyElementTable::query()
             ->setSelect([
                 '*',
-                 'STATUS_VALUE' => 'STATUS.VALUE',
-                 'CREATED_BY_NAME' => 'AUTHOR.NAME',
-                 'CREATED_BY_LAST_NAME' => 'AUTHOR.LAST_NAME',
-                 'CREATED_BY_SECOND_NAME' => 'AUTHOR.SECOND_NAME',
-                 'CREATED_BY_LOGIN' => 'AUTHOR.LOGIN'
+                'STATUS_VALUE' => 'STATUS.VALUE',
+                'CREATED_BY_NAME' => 'AUTHOR.NAME',
+                'CREATED_BY_LAST_NAME' => 'AUTHOR.LAST_NAME',
+                'CREATED_BY_SECOND_NAME' => 'AUTHOR.SECOND_NAME',
+                'CREATED_BY_LOGIN' => 'AUTHOR.LOGIN'
             ])
             ->where('ACTIVE', 'Y')
             ->setOrder($order)
@@ -109,54 +108,53 @@ class MyElementListComponent extends \CBitrixComponent implements Controllerable
         );
         $query->registerRuntimeField($userRelation);
 
-		$pageNavigation->setRecordCount($query->queryCountTotal());
+        $pageNavigation->setRecordCount($query->queryCountTotal());
 
         $resRows = $query->fetchAll();
-		foreach($resRows as $row)
-		{
-			$rowActions = [];
+        foreach ($resRows as $row) {
+            $rowActions = [];
 
-            if($canEdit) {
+            if ($canEdit) {
                 $rowActions[] = [
                     'text' => Loc::getMessage('MTH_ACTION_DELETE'),
                     'onclick' => sprintf('BX.MyElementList.Instance.deleteQueue(%d)', $row['ID'])
                 ];
             }
 
-			$rows[] = [
-				'data' => $row,
-				'actions' => $rowActions
-			];
-		}
+            $rows[] = [
+                'data' => $row,
+                'actions' => $rowActions
+            ];
+        }
 
-		return $rows;
-	}
+        return $rows;
+    }
 
-	protected function getPageNavigation(): PageNavigation
-	{
-		$gridOptions = new Options($this->gridId);
-		$navParams = $gridOptions->GetNavParams();
+    protected function getPageNavigation(): PageNavigation
+    {
+        $gridOptions = new Options($this->gridId);
+        $navParams = $gridOptions->GetNavParams();
 
-		$pageNavigation= new PageNavigation($this->gridId);
-		$pageNavigation->setPageSize($navParams['nPageSize'])->initFromUri();
+        $pageNavigation = new PageNavigation($this->gridId);
+        $pageNavigation->setPageSize($navParams['nPageSize'])->initFromUri();
 
-		return $pageNavigation;
-	}
+        return $pageNavigation;
+    }
 
-	protected function getPageSizes(): array
-	{
-		return [
-			['NAME' => '5', 'VALUE' => '5'],
-			['NAME' => '10', 'VALUE' => '10'],
-			['NAME' => '20', 'VALUE' => '20'],
-			['NAME' => '50', 'VALUE' => '50'],
-			['NAME' => '100', 'VALUE' => '100']
-		];
-	}
+    protected function getPageSizes(): array
+    {
+        return [
+            ['NAME' => '5', 'VALUE' => '5'],
+            ['NAME' => '10', 'VALUE' => '10'],
+            ['NAME' => '20', 'VALUE' => '20'],
+            ['NAME' => '50', 'VALUE' => '50'],
+            ['NAME' => '100', 'VALUE' => '100']
+        ];
+    }
 
     public function deleteAction(int $queueId): ?array
     {
-        if(!$this->canEdit()){
+        if (!$this->canEdit()) {
             $this->errors[] = new Error(Loc::getMessage('MTH_ACCESS_DENIED'));
             return null;
         }
