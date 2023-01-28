@@ -18,6 +18,7 @@ use Bitrix\Main\UserTable;
 class MyElementListComponent extends \CBitrixComponent implements Controllerable, Errorable
 {
 	protected $gridId = 'myelement_grid_list';
+    const IBLOCK_ID = 17;
 
     public function __construct($component = null)
     {
@@ -52,7 +53,7 @@ class MyElementListComponent extends \CBitrixComponent implements Controllerable
 
     public function canEdit(): bool
     {
-        $iblockPermission = CIBlock::GetPermission(ElementMyElementTable::getEntity()->getField("IBLOCK_ID"));
+        $iblockPermission = CIBlock::GetPermission(self::IBLOCK_ID);
         return ($iblockPermission >= 'U');
     }
 
