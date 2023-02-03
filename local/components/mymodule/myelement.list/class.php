@@ -18,6 +18,7 @@ use Bitrix\Main\UserTable;
 class MyElementListComponent extends \CBitrixComponent implements Controllerable, Errorable
 {
     protected $gridId = 'myelement_grid_list';
+    protected ErrorCollection $errors;
 
     public function __construct($component = null)
     {
